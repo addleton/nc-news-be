@@ -15,3 +15,10 @@ exports.selectApi = () => {
       return JSON.parse(contents);
     });
 };
+
+exports.selectArticles = () => {
+    let queryString = `SELECT * FROM articles`
+    return db.query(queryString).then(({rows}) => {
+        return rows
+    })
+}

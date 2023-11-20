@@ -46,3 +46,22 @@ describe("GET /api", () => {
             });
     });
 });
+
+describe('GET /api/articles', () => {
+  test('200: responds with an array of all articles with relevant keys', () => {
+    return request(app).get('/api/articles').expect(200).then(({body}) => {
+      expect(body.articles).toHaveLength(13)
+      body.articles.forEach((article) => {
+        expect(article).toMatchObject({
+          author: expect.any(String),
+          title: expect.any(String),
+          article_id: expect.any(Number),
+          topic: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String)
+        })
+      })
+    })
+  });
+});
