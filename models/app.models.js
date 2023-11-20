@@ -8,14 +8,15 @@ exports.selectTopics = () => {
 };
 
 exports.selectArticleById = (id) => {
-    if (isNaN(Number(id))) {
+    if (isNaN(Number(id)) && id !== undefined) {
         return Promise.reject({ status: 400, msg: "Bad Request" });
     }
+
     let queryString = `SELECT * FROM articles `;
-    if (id) {
-        queryString += `WHERE article_id = ${id} `;
-    }
-    return db.query(queryString).then(({ rows }) => {
+    const queryValues = [id];
+    queryString += `WHERE article_id = $1 `;
+
+    return db.query(queryString, queryValues).then(({ rows }) => {
         if (!rows[0]) {
             return Promise.reject({ status: 404, msg: "Not Found" });
         }
