@@ -1,5 +1,6 @@
 const db = require("../db/connection");
 
+const fs = require("fs/promises");
 exports.selectTopics = () => {
     let queryString = `SELECT * FROM topics`;
     return db.query(queryString).then(({ rows }) => {
@@ -21,5 +22,16 @@ exports.selectArticleById = (id) => {
             return Promise.reject({ status: 404, msg: "Not Found" });
         }
         return rows[0];
+    })
+}
+
+
+
+exports.selectApi = () => {
+  return fs
+    .readFile(`${__dirname}/../endpoints.json`, "utf8")
+    .then((contents) => {
+      return JSON.parse(contents);
+
     });
 };
