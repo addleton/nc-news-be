@@ -2,37 +2,47 @@ const request = require("supertest");
 const app = require("../app");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
-const index = require("../db/data/test-data/index");
+const data = require("../db/data/test-data/index");
 const sorted = require("jest-sorted");
+const fs = require("fs/promises");
 
 afterAll(() => {
-  return db.end();
+    return db.end();
 });
 
 beforeEach(() => {
-  return seed(index);
+    return seed(data);
 });
 
 describe("GET /api/topics", () => {
-  test("200: get all topics", () => {
-    return request(app)
-      .get("/api/topics")
-      .expect(200)
-      .then((response) => {
-        expect(response.body).toHaveLength(3);
-      });
-  });
-  test("200: all returned topics have relevant keys", () => {
-    return request(app)
-      .get("/api/topics")
-      .expect(200)
-      .then((response) => {
-        response.body.forEach((topic) => {
-          expect(topic).toMatchObject({
-            slug: expect.any(String),
-            description: expect.any(String),
-          });
-        });
-      });
-  });
+    test("200: all returned topics have relevant keys", () => {
+        return request(app)
+            .get("/api/topics")
+            .expect(200)
+            .then((response) => {
+                expect(response.body).toHaveLength(3);
+                response.body.forEach((topic) => {
+                    expect(topic).toMatchObject({
+                        slug: expect.any(String),
+                        description: expect.any(String),
+                    });
+                });
+            });
+    });
+});
+
+describe("GET /api", () => {
+    test("200: responds with an object of all available endpoints and descriptions", () => {
+        return request(app)
+            .get("/api")
+            .expect(200)
+            .then((response) => {
+                return fs
+                    .readFile(`${__dirname}/../endpoints.json`, "utf8")
+                    .then((contents) => {
+                        const parsedContents = JSON.parse(contents);
+                        expect(response.body).toEqual(parsedContents);
+                    });
+            });
+    });
 });
