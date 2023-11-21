@@ -67,4 +67,42 @@ describe("POST /api/articles/:article_id/comments", () => {
                 });
             });
     });
+    test("400: responds with error message when new comment is missing a property", () => {
+        const newComment = {
+            body: "There are a lot of different mysterious places in this world and I would love to visit any of them.",
+        };
+        return request(app)
+            .post("/api/articles/1/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
+    test('400: respond with error message when given an article id that is not a number', () => {
+        const newComment = {
+            username: "butter_bridge",
+            body: "There are a lot of different mysterious places in this world and I would love to visit any of them.",
+        };
+        return request(app)
+        .post("/api/articles/pepsi/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Bad request");
+        });
+    });
+    test('404: responds with error message when given a number that does not exist', () => {
+        const newComment = {
+            username: "butter_bridge",
+            body: "There are a lot of different mysterious places in this world and I would love to visit any of them.",
+        };
+        return request(app)
+        .post("/api/articles/99/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Article not found");
+        });
+    })
 });

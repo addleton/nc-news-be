@@ -3,6 +3,7 @@ const {
     selectArticleById,
     selectApi,
     insertComment,
+    checkArticleExists,
 } = require("../models/app.models");
 
 exports.getTopics = (req, res, next) => {
@@ -29,7 +30,14 @@ exports.getApi = (req, res, next) => {
 exports.postCommentByArticle = (req, res, next) => {
     const newComment = req.body;
     const { article_id } = req.params;
-    insertComment(newComment, article_id).then((comment) => {
-        res.status(201).send({ comment });
-    });
+    const promiseArray = [
+        insertComment(newComment, article_id),
+        checkArticleExists(article_id),
+    ];
+    Promise.all(promiseArray)
+        .then((resolvedPromises) => {
+            const comment = resolvedPromises[0];
+            res.status(201).send({ comment });
+        })
+        .catch(next);
 };
