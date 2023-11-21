@@ -1,9 +1,10 @@
 const {
     selectTopics,
-    selectArticleById,
     selectApi,
     insertComment,
     checkArticleExists,
+    selectArticles,
+    selectArticleById,
 } = require("../models/app.models");
 
 exports.getTopics = (req, res, next) => {
@@ -40,4 +41,9 @@ exports.postCommentByArticle = (req, res, next) => {
             res.status(201).send({ comment });
         })
         .catch(next);
+};
+exports.getArticles = (req, res, next) => {
+    selectArticles().then((articles) => {
+        res.status(200).send({ articles });
+    });
 };

@@ -79,30 +79,56 @@ describe("POST /api/articles/:article_id/comments", () => {
                 expect(body.msg).toBe("Bad request");
             });
     });
-    test('400: respond with error message when given an article id that is not a number', () => {
+    test("400: respond with error message when given an article id that is not a number", () => {
         const newComment = {
             username: "butter_bridge",
             body: "There are a lot of different mysterious places in this world and I would love to visit any of them.",
         };
         return request(app)
-        .post("/api/articles/pepsi/comments")
-        .send(newComment)
-        .expect(400)
-        .then(({ body }) => {
-            expect(body.msg).toBe("Bad request");
-        });
+            .post("/api/articles/pepsi/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
     });
-    test('404: responds with error message when given a number that does not exist', () => {
+    test("404: responds with error message when given a number that does not exist", () => {
         const newComment = {
             username: "butter_bridge",
             body: "There are a lot of different mysterious places in this world and I would love to visit any of them.",
         };
         return request(app)
-        .post("/api/articles/99/comments")
-        .send(newComment)
-        .expect(404)
-        .then(({ body }) => {
-            expect(body.msg).toBe("Article not found");
-        });
-    })
+            .post("/api/articles/99/comments")
+            .send(newComment)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Article not found");
+            });
+    });
+});
+describe("GET /api/articles", () => {
+    test("200: responds with an array of all articles with relevant keys, sorted by date in descending order", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.articles).toHaveLength(13);
+                expect(body.articles).toBeSortedBy("created_at", {
+                    descending: true,
+                });
+                expect(body.articles.body).toBe(undefined);
+                body.articles.forEach((article) => {
+                    expect(article).toMatchObject({
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        article_id: expect.any(Number),
+                        topic: expect.any(String),
+                        created_at: expect.any(String),
+                        votes: expect.any(Number),
+                        article_img_url: expect.any(String),
+                        comment_count: expect.any(String),
+                    });
+                });
+            });
+    });
 });
