@@ -68,4 +68,38 @@ describe("GET /api/articles/:article_id/comments", () => {
                 });
             });
     });
+    test("200: is added to api endpoint", () => {
+        return request(app)
+            .get("/api")
+            .expect(200)
+            .then((response) => {
+                return fs
+                    .readFile(`${__dirname}/../endpoints.json`, "utf8")
+                    .then((contents) => {
+                        const parsedContents = JSON.parse(contents);
+                        expect(
+                            Object.hasOwn(
+                                response.body,
+                                "GET /api/articles/:article_id/comments"
+                            )
+                        ).toBe(true);
+                    });
+            });
+    });
+    test("404: responds with error message when passed a number that does not match an article id", () => {
+        return request(app)
+            .get("/api/articles/99/comments")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Article not found");
+            });
+    });
+    test("400: responds with error messahe when passed not a number", () => {
+        return request(app)
+            .get("/api/articles/pepsi/comments")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
 });

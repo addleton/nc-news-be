@@ -3,6 +3,7 @@ const {
     selectArticleById,
     selectApi,
     selectComments,
+    checkIfArticleExists,
 } = require("../models/app.models");
 
 exports.getTopics = (req, res, next) => {
@@ -28,7 +29,17 @@ exports.getApi = (req, res, next) => {
 
 exports.getComments = (req, res, next) => {
     const { article_id } = req.params;
-    selectComments(article_id).then((comments) => {
-        res.status(200).send({ comments });
-    });
+
+    const commentPromises = [selectComments(article_id)];
+
+    if (article_id) {
+        commentPromises.push(checkIfArticleExists(article_id));
+    }
+
+    Promise.all(commentPromises)
+        .then((resolvedPromises) => {
+            const comments = resolvedPromises[0];
+            res.status(200).send({ comments });
+        })
+        .catch(next);
 };
