@@ -34,28 +34,17 @@ exports.selectApi = () => {
 };
 
 exports.selectArticles = () => {
-    let queryString = `SELECT * FROM articles ORDER BY created_at DESC`;
+    const queryString = `
+        SELECT articles.*, COALESCE(COUNT(comments.article_id), 0) AS comment_count
+        FROM articles
+        LEFT JOIN comments ON articles.article_id = comments.article_id
+        GROUP BY articles.article_id
+        ORDER BY articles.created_at DESC
+    `;
+
     return db.query(queryString).then(({ rows }) => {
         return rows;
     });
-};
-
-exports.getCommentCount = (articles) => {
-    const commentCount = articles.map((article) => {
-        return db
-            .query(
-                `SELECT article_id, COUNT(*) FROM comments WHERE article_id = $1
-            GROUP BY article_id`,
-                [article.article_id]
-            )
-            .then(({ rows }) => {
-                if (rows[0] === undefined) {
-                    return { article_id: article.article_id };
-                }
-                return rows[0];
-            });
-    });
-    return Promise.all(commentCount);
 };
 
 exports.addCommentCount = (comments) => {
