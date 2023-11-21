@@ -47,6 +47,19 @@ exports.insertComment = (comment, id) => {
         });
 };
 
+exports.selectComments = (id) => {
+    return db
+        .query(
+            `SELECT * FROM comments
+            WHERE article_id = $1
+            ORDER BY created_at ASC`,
+            [id]
+        )
+        .then(({ rows }) => {
+            return rows;
+        });
+};
+
 exports.checkArticleExists = (id) => {
     if (isNaN(Number(id)) && id !== undefined) {
         return Promise.reject({ status: 400, msg: "Bad request" });

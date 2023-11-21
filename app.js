@@ -4,9 +4,11 @@ const {
     getTopics,
     getApi,
     postCommentByArticle,
+    getComments,
     getArticles,
     getArticleById,
 } = require("./controllers/app.controllers");
+
 const { handlePsqlErrors, handleCustomErrors } = require("./errors");
 app.use(express.json());
 
@@ -17,6 +19,7 @@ app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id", getArticleById);
 
+app.get("/api/articles/:article_id/comments", getComments);
 app.post("/api/articles/:article_id/comments", postCommentByArticle);
 
 app.use(handlePsqlErrors);

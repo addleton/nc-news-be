@@ -1,6 +1,7 @@
 const {
     selectTopics,
     selectApi,
+    selectComments,
     insertComment,
     checkArticleExists,
     selectArticles,
@@ -42,6 +43,21 @@ exports.postCommentByArticle = (req, res, next) => {
         })
         .catch(next);
 };
+
+exports.getComments = (req, res, next) => {
+    const { article_id } = req.params;
+    const commentPromises = [selectComments(article_id)];
+    if (article_id) {
+        commentPromises.push(checkArticleExists(article_id));
+    }
+    Promise.all(commentPromises)
+        .then((resolvedPromises) => {
+            const comments = resolvedPromises[0];
+            res.status(200).send({ comments });
+        })
+        .catch(next);
+};
+
 exports.getArticles = (req, res, next) => {
     selectArticles().then((articles) => {
         res.status(200).send({ articles });
