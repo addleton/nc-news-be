@@ -46,3 +46,26 @@ describe("GET /api", () => {
             });
     });
 });
+
+describe("GET /api/articles/:article_id/comments", () => {
+    test("200: responds with comment with all relavant keys, most recent first", () => {
+        return request(app)
+            .get("/api/articles/5/comments")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comments).toBeSorted("created_at", {
+                    ascending: true,
+                });
+                body.comments.forEach((comment) => {
+                    expect(comment).toMatchObject({
+                        comment_id: expect.any(Number),
+                        votes: expect.any(Number),
+                        created_at: expect.any(String),
+                        author: expect.any(String),
+                        body: expect.any(String),
+                        article_id: expect.any(Number),
+                    });
+                });
+            });
+    });
+});
