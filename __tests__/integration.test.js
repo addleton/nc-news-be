@@ -19,9 +19,10 @@ describe("GET /api/topics", () => {
         return request(app)
             .get("/api/topics")
             .expect(200)
-            .then((response) => {
-                expect(response.body).toHaveLength(3);
-                response.body.forEach((topic) => {
+
+            .then(({ body }) => {
+                expect(body.topics).toHaveLength(3);
+                body.topics.forEach((topic) => {
                     expect(topic).toMatchObject({
                         slug: expect.any(String),
                         description: expect.any(String),
@@ -30,7 +31,6 @@ describe("GET /api/topics", () => {
             });
     });
 });
-
 describe("GET /api", () => {
     test("200: responds with an object of all available endpoints and descriptions", () => {
         return request(app)
