@@ -1,8 +1,12 @@
 const {
     selectTopics,
-    selectArticleById,
     selectApi,
+    selectArticles,
+    getCommentCount,
+    addCommentCount,
+    selectArticleById,
 } = require("../models/app.models");
+const { changeUndefinedComments } = require("../utils");
 
 exports.getTopics = (req, res, next) => {
     selectTopics().then((topics) => {
@@ -22,5 +26,10 @@ exports.getArticleById = (req, res, next) => {
 exports.getApi = (req, res, next) => {
     selectApi().then((result) => {
         res.status(200).send(result);
+    });
+};
+exports.getArticles = (req, res, next) => {
+    selectArticles().then((articles) => {
+        res.status(200).send({ articles });
     });
 };
