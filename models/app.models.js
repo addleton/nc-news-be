@@ -33,6 +33,34 @@ exports.selectApi = () => {
         });
 };
 
+exports.selectComments = (id) => {
+    return db
+        .query(
+            `SELECT * FROM comments
+            WHERE article_id = $1
+            ORDER BY created_at ASC`,
+            [id]
+        )
+        .then(({ rows }) => {
+            return rows;
+        });
+};
+
+exports.checkIfArticleExists = (id) => {
+    if (isNaN(Number(id)) && id !== undefined) {
+        return Promise.reject({ status: 400, msg: "Bad request" });
+    }
+    return db
+        .query(`SELECT * FROM articles WHERE article_id = $1`, [id])
+        .then(({ rows }) => {
+            if (!rows.length) {
+                return Promise.reject({
+                    status: 404,
+                    msg: "Article not found",
+                });
+            }
+        });
+};
 exports.selectArticles = () => {
     const queryString = `
         SELECT articles.*, COALESCE(COUNT(comments.article_id), 0) AS comment_count
@@ -45,23 +73,4 @@ exports.selectArticles = () => {
     return db.query(queryString).then(({ rows }) => {
         return rows;
     });
-};
-
-exports.addCommentCount = (comments) => {
-    return db
-        .query(
-            `ALTER TABLE articles
-            ADD comment_count INT`
-        )
-        .then(() => {
-            const insertPromises = comments.map((comment) => {
-                return db.query(
-                    `UPDATE articles
-                    SET comment_count = $1
-                    WHERE article_id = $2`,
-                    [comment.count, comment.article_id]
-                );
-            });
-            return Promise.all(insertPromises);
-        });
 };
