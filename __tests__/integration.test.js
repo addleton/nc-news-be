@@ -46,3 +46,25 @@ describe("GET /api", () => {
             });
     });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+    test("201: inserts new comment into db and responds with posted comment", () => {
+        const newComment = {
+            username: "butter_bridge",
+            body: "There are a lot of different mysterious places in this world and I would love to visit any of them.",
+        };
+        return request(app)
+            .post("/api/articles/1/comments")
+            .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.comment).toMatchObject({
+                    body: "There are a lot of different mysterious places in this world and I would love to visit any of them.",
+                    author: "butter_bridge",
+                    votes: expect.any(Number),
+                    article_id: expect.any(Number),
+                    created_at: expect.any(String),
+                });
+            });
+    });
+});
