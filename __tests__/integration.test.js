@@ -181,3 +181,44 @@ describe("POST /api/articles/:article_id/comments", () => {
             });
     });
 });
+
+describe("PATCH /api/articles/:article_id", () => {
+    test("200: increments votes by amount passed in and responds with updated article", () => {
+        const newVote = 5;
+        return request(app)
+            .patch("/api/articles/1")
+            .send({ inc_votes: newVote })
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.article.votes).toBe(105);
+                expect(body.article).toMatchObject({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    article_img_url: expect.any(String),
+                });
+            });
+    });
+    test("200: decrements votes by amount passed in and responds with updated article", () => {
+        const newVote = -5;
+        return request(app)
+            .patch("/api/articles/1")
+            .send({ inc_votes: newVote })
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.article.votes).toBe(95);
+                expect(body.article).toMatchObject({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    article_img_url: expect.any(String),
+                });
+            });
+    });
+});
