@@ -1,7 +1,5 @@
 const db = require("../db/connection");
 
-const fs = require("fs/promises");
-
 exports.selectArticleById = (id) => {
     if (isNaN(Number(id)) && id !== undefined) {
         return Promise.reject({ status: 400, msg: "Bad Request" });
