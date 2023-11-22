@@ -53,7 +53,7 @@ describe("GET /api/articles/:article_id/comments", () => {
             .get("/api/articles/5/comments")
             .expect(200)
             .then(({ body }) => {
-                expect(body.comments).toHaveLength(2)
+                expect(body.comments).toHaveLength(2);
                 expect(body.comments).toBeSorted("created_at", {
                     ascending: true,
                 });
@@ -109,6 +109,66 @@ describe("GET /api/articles/:article_id/comments", () => {
                             )
                         ).toBe(true);
                     });
+            });
+    });
+});
+
+describe("POST /api/articles/:article_id/comments", () => {
+    test("201: inserts new comment into db and responds with posted comment", () => {
+        const newComment = {
+            username: "butter_bridge",
+            body: "There are a lot of different mysterious places in this world and I would love to visit any of them.",
+        };
+        return request(app)
+            .post("/api/articles/1/comments")
+            .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.comment).toMatchObject({
+                    body: "There are a lot of different mysterious places in this world and I would love to visit any of them.",
+                    author: "butter_bridge",
+                    votes: expect.any(Number),
+                    article_id: expect.any(Number),
+                    created_at: expect.any(String),
+                });
+            });
+    });
+    test("400: responds with error message when new comment is missing a property", () => {
+        const newComment = {
+            body: "There are a lot of different mysterious places in this world and I would love to visit any of them.",
+        };
+        return request(app)
+            .post("/api/articles/1/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
+    test("400: respond with error message when given an article id that is not a number", () => {
+        const newComment = {
+            username: "butter_bridge",
+            body: "There are a lot of different mysterious places in this world and I would love to visit any of them.",
+        };
+        return request(app)
+            .post("/api/articles/pepsi/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
+    test("404: responds with error message when given a number that does not exist", () => {
+        const newComment = {
+            username: "butter_bridge",
+            body: "There are a lot of different mysterious places in this world and I would love to visit any of them.",
+        };
+        return request(app)
+            .post("/api/articles/99/comments")
+            .send(newComment)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Article not found");
             });
     });
 });

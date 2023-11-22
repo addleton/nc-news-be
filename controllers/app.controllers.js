@@ -2,7 +2,8 @@ const {
     selectTopics,
     selectApi,
     selectComments,
-    checkIfArticleExists,
+    insertComment,
+    checkArticleExists,
     selectArticles,
     selectArticleById,
 } = require("../models/app.models");
@@ -28,11 +29,26 @@ exports.getApi = (req, res, next) => {
     });
 };
 
+exports.postCommentByArticle = (req, res, next) => {
+    const newComment = req.body;
+    const { article_id } = req.params;
+    const promiseArray = [
+        insertComment(newComment, article_id),
+        checkArticleExists(article_id),
+    ];
+    Promise.all(promiseArray)
+        .then((resolvedPromises) => {
+            const comment = resolvedPromises[0];
+            res.status(201).send({ comment });
+        })
+        .catch(next);
+};
+
 exports.getComments = (req, res, next) => {
     const { article_id } = req.params;
     const commentPromises = [selectComments(article_id)];
     if (article_id) {
-        commentPromises.push(checkIfArticleExists(article_id));
+        commentPromises.push(checkArticleExists(article_id));
     }
     Promise.all(commentPromises)
         .then((resolvedPromises) => {
@@ -41,6 +57,7 @@ exports.getComments = (req, res, next) => {
         })
         .catch(next);
 };
+
 exports.getArticles = (req, res, next) => {
     selectArticles().then((articles) => {
         res.status(200).send({ articles });

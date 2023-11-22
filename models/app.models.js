@@ -33,6 +33,20 @@ exports.selectApi = () => {
         });
 };
 
+exports.insertComment = (comment, id) => {
+    return db
+        .query(
+            `INSERT INTO comments
+                    (author, body, article_id)
+                    VALUES
+                    ($1, $2, $3) RETURNING *`,
+            [comment.username, comment.body, id]
+        )
+        .then(({ rows }) => {
+            return rows[0];
+        });
+};
+
 exports.selectComments = (id) => {
     return db
         .query(
@@ -46,7 +60,7 @@ exports.selectComments = (id) => {
         });
 };
 
-exports.checkIfArticleExists = (id) => {
+exports.checkArticleExists = (id) => {
     if (isNaN(Number(id)) && id !== undefined) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
