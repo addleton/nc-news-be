@@ -1,7 +1,5 @@
 const db = require("../db/connection");
 
-const fs = require("fs/promises");
-
 exports.selectArticleById = (id) => {
     if (isNaN(Number(id)) && id !== undefined) {
         return Promise.reject({ status: 400, msg: "Bad Request" });
@@ -46,4 +44,18 @@ exports.selectArticles = () => {
     return db.query(queryString).then(({ rows }) => {
         return rows;
     });
+};
+
+exports.updateArticles = (id, vote) => {
+    return db
+        .query(
+            `UPDATE articles
+                    SET votes = GREATEST(votes + $1, 0)
+                    WHERE article_id = $2
+                    RETURNING *`,
+            [vote.inc_votes, id]
+        )
+        .then(({ rows }) => {
+            return rows[0];
+        });
 };
