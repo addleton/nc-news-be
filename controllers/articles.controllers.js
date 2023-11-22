@@ -3,12 +3,16 @@ const {
     selectArticleById,
     updateArticles,
     checkArticleExists,
+    checkArticleQuery,
 } = require("../models/articles.models");
 
 exports.getArticles = (req, res, next) => {
-    selectArticles().then((articles) => {
+    const [query] = Object.keys(req.query)
+    const {topic} = req.query
+    checkArticleQuery(query)
+    selectArticles(topic).then((articles) => {
         res.status(200).send({ articles });
-    });
+    }).catch(next)
 };
 
 exports.getArticleById = (req, res, next) => {

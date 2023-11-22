@@ -32,16 +32,20 @@ exports.checkArticleExists = (id) => {
             }
         });
 };
-exports.selectArticles = () => {
-    const queryString = `
+exports.selectArticles = (topic) => {
+    const queryArray = [];
+    let queryString = `
         SELECT articles.*, COALESCE(COUNT(comments.article_id), 0) AS comment_count
         FROM articles
-        LEFT JOIN comments ON articles.article_id = comments.article_id
-        GROUP BY articles.article_id
-        ORDER BY articles.created_at DESC
-    `;
+        LEFT JOIN comments ON articles.article_id = comments.article_id `;
+    if (topic) {
+        queryArray.push(topic);
+        queryString += `WHERE articles.topic = $1`;
+    }
+    queryString += `GROUP BY articles.article_id 
+                    ORDER BY articles.created_at DESC `;
 
-    return db.query(queryString).then(({ rows }) => {
+    return db.query(queryString, queryArray).then(({ rows }) => {
         return rows;
     });
 };
@@ -59,3 +63,9 @@ exports.updateArticles = (id, vote) => {
             return rows[0];
         });
 };
+
+exports.checkArticleQuery = (query) => {
+    return db.query(`SELECT $1 FROM articles`, [query]).then(({rows}) => {
+        console.log(rows)
+    })
+}
