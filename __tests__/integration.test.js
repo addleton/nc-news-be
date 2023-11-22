@@ -14,6 +14,12 @@ beforeEach(() => {
     return seed(data);
 });
 
+describe("Invalid URL", () => {
+    test("404: responds with status code when given an invalid url", () => {
+        return request(app).get("/api/pepsi").expect(404);
+    });
+});
+
 describe("GET /api", () => {
     test("200: responds with an object of all available endpoints and descriptions", () => {
         return request(app)
@@ -293,6 +299,24 @@ describe("DELETE /api/comments/:comment_id", () => {
             .expect(404)
             .then(({ body }) => {
                 expect(body.msg).toBe("Comment not found");
+            });
+    });
+});
+
+describe("GET /api/users", () => {
+    test("200: responds with an array of all users with relavant properties", () => {
+        return request(app)
+            .get("/api/users")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.users).toHaveLength(4);
+                body.users.forEach((user) => {
+                    expect(user).toMatchObject({
+                        username: expect.any(String),
+                        name: expect.any(String),
+                        avatar_url: expect.any(String),
+                    });
+                });
             });
     });
 });
