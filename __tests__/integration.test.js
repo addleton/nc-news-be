@@ -15,7 +15,7 @@ beforeEach(() => {
 });
 
 describe("Invalid URL", () => {
-    test.only("404: responds with status code when given an invalid url", () => {
+    test("404: responds with status code when given an invalid url", () => {
         return request(app).get("/api/pepsi").expect(404);
     });
 });
