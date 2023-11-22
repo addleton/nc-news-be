@@ -19,6 +19,12 @@ const {
 } = require("./errors");
 const { getUsers } = require("./controllers/users.controllers");
 
+
+
+
+
+
+
 app.use(express.json());
 
 app.get("/api", getApi);
