@@ -13,3 +13,7 @@ exports.handleCustomErrors = (err, req, res, next) => {
     }
     next(err);
 };
+exports.handleInvalidUrl = (err, req, res, next) => {
+
+    res.status(404).send('Not found')
+}
