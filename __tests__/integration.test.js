@@ -182,6 +182,99 @@ describe("POST /api/articles/:article_id/comments", () => {
     });
 });
 
+describe("PATCH /api/articles/:article_id", () => {
+    test("200: increments votes by amount passed in and responds with updated article", () => {
+        const newVote = 5;
+        return request(app)
+            .patch("/api/articles/1")
+            .send({ inc_votes: newVote })
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.article).toEqual({
+                    article_id: 1,
+                    title: "Living in the shadow of a great man",
+                    topic: "mitch",
+                    author: "butter_bridge",
+                    body: "I find this existence challenging",
+                    created_at: "2020-07-09T20:11:00.000Z",
+                    votes: 105,
+                    article_img_url:
+                        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                });
+            });
+    });
+    test("200: decrements votes by amount passed in and responds with updated article", () => {
+        const newVote = -5;
+        return request(app)
+            .patch("/api/articles/1")
+            .send({ inc_votes: newVote })
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.article).toEqual({
+                    article_id: 1,
+                    title: "Living in the shadow of a great man",
+                    topic: "mitch",
+                    author: "butter_bridge",
+                    body: "I find this existence challenging",
+                    created_at: "2020-07-09T20:11:00.000Z",
+                    votes: 95,
+                    article_img_url:
+                        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                });
+            });
+    });
+    test("200: does not decrement votes below 0", () => {
+        const newVote = -1000;
+        return request(app)
+            .patch("/api/articles/1")
+            .send({ inc_votes: newVote })
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.article).toEqual({
+                    article_id: 1,
+                    title: "Living in the shadow of a great man",
+                    topic: "mitch",
+                    author: "butter_bridge",
+                    body: "I find this existence challenging",
+                    created_at: "2020-07-09T20:11:00.000Z",
+                    votes: 0,
+                    article_img_url:
+                        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                });
+            });
+    });
+    test("400: responds with error when passed an article ID that is not a number", () => {
+        const newVote = -5;
+        return request(app)
+            .patch("/api/articles/pepsi")
+            .send({ inc_votes: newVote })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
+    test("404: responds with error when passed an article ID that is a number but does not exist", () => {
+        const newVote = -5;
+        return request(app)
+            .patch("/api/articles/99")
+            .send({ inc_votes: newVote })
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Article not found");
+            });
+    });
+    test("400: responds with error when passed a vote that is not a number", () => {
+        const newVote = "pepsi";
+        return request(app)
+            .patch("/api/articles/1")
+            .send({ inc_votes: newVote })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
+});
+
 describe("DELETE /api/comments/:comment_id", () => {
     test("204: responds with correct status", () => {
         return request(app).delete("/api/comments/2").expect(204);

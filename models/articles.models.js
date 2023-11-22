@@ -47,3 +47,17 @@ exports.selectArticles = () => {
         return rows;
     });
 };
+
+exports.updateArticles = (id, vote) => {
+    return db
+        .query(
+            `UPDATE articles
+                    SET votes = GREATEST(votes + $1, 0)
+                    WHERE article_id = $2
+                    RETURNING *`,
+            [vote.inc_votes, id]
+        )
+        .then(({ rows }) => {
+            return rows[0];
+        });
+};
