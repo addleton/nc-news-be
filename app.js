@@ -1,15 +1,17 @@
 const express = require("express");
 const app = express();
 const {
-    getTopics,
-    getApi,
-    postCommentByArticle,
-    getComments,
     getArticles,
     getArticleById,
-} = require("./controllers/app.controllers");
-
+} = require("./controllers/articles.controllers");
+const { getApi } = require("./controllers/app.controllers");
+const { getTopics } = require("./controllers/topics.controllers");
+const {
+    postCommentByArticle,
+    getComments,
+} = require("./controllers/comments.controllers");
 const { handlePsqlErrors, handleCustomErrors } = require("./errors");
+
 app.use(express.json());
 
 app.get("/api", getApi);

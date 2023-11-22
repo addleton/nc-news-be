@@ -14,6 +14,22 @@ beforeEach(() => {
     return seed(data);
 });
 
+describe("GET /api", () => {
+    test("200: responds with an object of all available endpoints and descriptions", () => {
+        return request(app)
+            .get("/api")
+            .expect(200)
+            .then((response) => {
+                return fs
+                    .readFile(`${__dirname}/../endpoints.json`, "utf8")
+                    .then((contents) => {
+                        const parsedContents = JSON.parse(contents);
+                        expect(response.body).toEqual(parsedContents);
+                    });
+            });
+    });
+});
+
 describe("GET /api/topics", () => {
     test("200: all returned topics have relevant keys", () => {
         return request(app)
@@ -31,18 +47,29 @@ describe("GET /api/topics", () => {
     });
 });
 
-describe("GET /api", () => {
-    test("200: responds with an object of all available endpoints and descriptions", () => {
+describe("GET /api/articles", () => {
+    test("200: responds with an array of all articles with relevant keys, sorted by date in descending order", () => {
         return request(app)
-            .get("/api")
+            .get("/api/articles")
             .expect(200)
-            .then((response) => {
-                return fs
-                    .readFile(`${__dirname}/../endpoints.json`, "utf8")
-                    .then((contents) => {
-                        const parsedContents = JSON.parse(contents);
-                        expect(response.body).toEqual(parsedContents);
+            .then(({ body }) => {
+                expect(body.articles).toHaveLength(13);
+                expect(body.articles).toBeSortedBy("created_at", {
+                    descending: true,
+                });
+                expect(body.articles.body).toBe(undefined);
+                body.articles.forEach((article) => {
+                    expect(article).toMatchObject({
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        article_id: expect.any(Number),
+                        topic: expect.any(String),
+                        created_at: expect.any(String),
+                        votes: expect.any(Number),
+                        article_img_url: expect.any(String),
+                        comment_count: expect.any(String),
                     });
+                });
             });
     });
 });
@@ -91,24 +118,6 @@ describe("GET /api/articles/:article_id/comments", () => {
             .expect(400)
             .then(({ body }) => {
                 expect(body.msg).toBe("Bad request");
-            });
-    });
-    test("200: is added to api endpoint", () => {
-        return request(app)
-            .get("/api")
-            .expect(200)
-            .then((response) => {
-                return fs
-                    .readFile(`${__dirname}/../endpoints.json`, "utf8")
-                    .then((contents) => {
-                        const parsedContents = JSON.parse(contents);
-                        expect(
-                            Object.hasOwn(
-                                response.body,
-                                "GET /api/articles/:article_id/comments"
-                            )
-                        ).toBe(true);
-                    });
             });
     });
 });
@@ -169,33 +178,6 @@ describe("POST /api/articles/:article_id/comments", () => {
             .expect(404)
             .then(({ body }) => {
                 expect(body.msg).toBe("Article not found");
-            });
-    });
-});
-
-describe("GET /api/articles", () => {
-    test("200: responds with an array of all articles with relevant keys, sorted by date in descending order", () => {
-        return request(app)
-            .get("/api/articles")
-            .expect(200)
-            .then(({ body }) => {
-                expect(body.articles).toHaveLength(13);
-                expect(body.articles).toBeSortedBy("created_at", {
-                    descending: true,
-                });
-                expect(body.articles.body).toBe(undefined);
-                body.articles.forEach((article) => {
-                    expect(article).toMatchObject({
-                        author: expect.any(String),
-                        title: expect.any(String),
-                        article_id: expect.any(Number),
-                        topic: expect.any(String),
-                        created_at: expect.any(String),
-                        votes: expect.any(Number),
-                        article_img_url: expect.any(String),
-                        comment_count: expect.any(String),
-                    });
-                });
             });
     });
 });
