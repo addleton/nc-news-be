@@ -221,4 +221,53 @@ describe("PATCH /api/articles/:article_id", () => {
                 });
             });
     });
+    test("200: does not decrement votes below 0", () => {
+        const newVote = -1000;
+        return request(app)
+            .patch("/api/articles/1")
+            .send({ inc_votes: newVote })
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.article.votes).toBe(0);
+                expect(body.article).toMatchObject({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    article_img_url: expect.any(String),
+                });
+            });
+    });
+    test("400: responds with error when passed an article ID that is not a number", () => {
+        const newVote = -5;
+        return request(app)
+            .patch("/api/articles/pepsi")
+            .send({ inc_votes: newVote })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
+    test("404: responds with error when passed an article ID that is a number but does not exist", () => {
+        const newVote = -5;
+        return request(app)
+            .patch("/api/articles/99")
+            .send({ inc_votes: newVote })
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Article not found");
+            });
+    });
+    test("400: responds with error when passed a vote that is not a number", () => {
+        const newVote = "pepsi";
+        return request(app)
+            .patch("/api/articles/1")
+            .send({ inc_votes: newVote })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
 });

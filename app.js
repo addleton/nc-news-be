@@ -13,6 +13,12 @@ const {
 } = require("./controllers/comments.controllers");
 const { handlePsqlErrors, handleCustomErrors } = require("./errors");
 
+
+
+
+
+
+
 app.use(express.json());
 
 app.get("/api", getApi);
