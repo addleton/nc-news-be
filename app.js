@@ -10,6 +10,7 @@ const { getTopics } = require("./controllers/topics.controllers");
 const {
     postCommentByArticle,
     getComments,
+    removeComments,
 } = require("./controllers/comments.controllers");
 const { handlePsqlErrors, handleCustomErrors } = require("./errors");
 
@@ -26,8 +27,10 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getComments);
+
 app.post("/api/articles/:article_id/comments", postCommentByArticle);
 app.patch("/api/articles/:article_id", patchArticles);
+app.delete('/api/comments/:comment_id', removeComments)
 
 app.use(handlePsqlErrors);
 app.use(handleCustomErrors);
