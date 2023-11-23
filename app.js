@@ -12,7 +12,18 @@ const {
     getComments,
     removeComments,
 } = require("./controllers/comments.controllers");
-const { handlePsqlErrors, handleCustomErrors } = require("./errors");
+const {
+    handlePsqlErrors,
+    handleCustomErrors,
+    handleInvalidUrl,
+} = require("./errors");
+const { getUsers } = require("./controllers/users.controllers");
+
+
+
+
+
+
 
 app.use(express.json());
 
@@ -21,12 +32,15 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getComments);
+app.get("/api/users", getUsers);
 
 app.post("/api/articles/:article_id/comments", postCommentByArticle);
 app.patch("/api/articles/:article_id", patchArticles);
 app.delete("/api/comments/:comment_id", removeComments);
+app.all("*", handleInvalidUrl);
 
 app.use(handlePsqlErrors);
 app.use(handleCustomErrors);
+app.use(handleInvalidUrl);
 
 module.exports = app;
