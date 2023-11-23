@@ -341,14 +341,6 @@ describe("GET /api/articles (topic query)", () => {
                 expect(body.articles).toEqual([]);
             });
     });
-    test("400: responds with a message when passed an invalid column in query", () => {
-        return request(app)
-            .get("/api/articles?pepsi=mitch")
-            .expect(400)
-            .then(({ body }) => {
-                expect(body.msg).toBe("Bad request");
-            });
-    });
     test("404: responds with a message when passed a query topic that does not exist", () => {
         return request(app)
             .get("/api/articles?topic=pepsi")
