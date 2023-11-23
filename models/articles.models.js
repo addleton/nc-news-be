@@ -23,7 +23,6 @@ exports.selectArticleById = (id) => {
 };
 
 exports.checkArticleExists = (id, query) => {
-    console.log(query);
     const validQueries = ["topic", "sort_by"];
     if (query && !validQueries.includes(query)) {
         return Promise.reject({ status: 400, msg: "Bad request" });

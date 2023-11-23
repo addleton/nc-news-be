@@ -389,14 +389,30 @@ describe("GET /api/articles/:article_id (comment_count)", () => {
 });
 
 describe("GET /api/articles (sorting queries)", () => {
-    test.only("200: responds with an array of all articles, sorted and ordered by the query passed in", () => {
+    test("200: responds with an array of all articles, sorted and ordered by the query passed in", () => {
         return request(app)
-            .get("/api/articles?sort_by=article_id&order=asc")
+            .get("/api/articles?sort_by=topic&order=asc")
             .expect(200)
             .then(({ body }) => {
-                expect(body.articles).toBeSortedBy("article_id", {
+                expect(body.articles).toBeSortedBy("topic", {
                     ascending: true,
                 });
+            });
+    });
+    test("400: responds with a message when passed an invalid sort by query", () => {
+        return request(app)
+            .get("/api/articles?sort_by=pepsi&order=asc")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
+    test("400: responds with a message when passed an invalid order query", () => {
+        return request(app)
+            .get("/api/articles?sort_by=topic&order=pepsi")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
             });
     });
 });
