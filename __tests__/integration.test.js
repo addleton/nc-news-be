@@ -320,3 +320,33 @@ describe("GET /api/users", () => {
             });
     });
 });
+
+describe("GET /api/articles (topic query)", () => {
+    test("200: responds with all articles matching the topic query", () => {
+        return request(app)
+            .get("/api/articles?topic=mitch")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.articles).toHaveLength(12);
+                body.articles.forEach((article) => {
+                    expect(article.topic).toBe("mitch");
+                });
+            });
+    });
+    test("200: responds with an empty array when no articles contain the topic passed in", () => {
+        return request(app)
+            .get("/api/articles?topic=paper")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.articles).toEqual([]);
+            });
+    });
+    test("404: responds with a message when passed a query topic that does not exist", () => {
+        return request(app)
+            .get("/api/articles?topic=pepsi")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found");
+            });
+    });
+});
