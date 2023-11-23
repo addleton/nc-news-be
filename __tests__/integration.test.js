@@ -350,3 +350,40 @@ describe("GET /api/articles (topic query)", () => {
             });
     });
 });
+
+describe("GET /api/articles/:article_id (comment_count)", () => {
+    test("200: responds with article with all relevant keys and a comment_count key", () => {
+        return request(app)
+            .get("/api/articles/1")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.article).toMatchObject({
+                    title: "Living in the shadow of a great man",
+                    topic: "mitch",
+                    author: "butter_bridge",
+                    body: "I find this existence challenging",
+                    created_at: "2020-07-09T20:11:00.000Z",
+                    votes: 100,
+                    article_img_url:
+                        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                    comment_count: "11",
+                });
+            });
+    });
+    test("404: responds with error message when passed a number that does not match an article id", () => {
+        return request(app)
+            .get("/api/articles/99")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not Found");
+            });
+    });
+    test("400: responds with error message when passed not a number", () => {
+        return request(app)
+            .get("/api/articles/pepsi")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad Request");
+            });
+    });
+});
