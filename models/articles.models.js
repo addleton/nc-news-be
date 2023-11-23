@@ -5,14 +5,19 @@ exports.selectArticleById = (id) => {
         return Promise.reject({ status: 400, msg: "Bad Request" });
     }
 
-    let queryString = `SELECT * FROM articles `;
-    const queryValues = [id];
-    queryString += `WHERE article_id = $1 `;
+    const queryString = `
+    SELECT articles.*, COALESCE(COUNT(comments.article_id), 0) AS comment_count
+    FROM articles
+    LEFT JOIN comments ON articles.article_id = comments.article_id
+    WHERE articles.article_id = $1
+    GROUP BY articles.article_id
+`;
 
-    return db.query(queryString, queryValues).then(({ rows }) => {
+    return db.query(queryString, [id]).then(({ rows }) => {
         if (!rows[0]) {
             return Promise.reject({ status: 404, msg: "Not Found" });
         }
+        console.log(rows);
         return rows[0];
     });
 };

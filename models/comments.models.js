@@ -48,3 +48,5 @@ exports.checkCommentExists = (id) => {
             }
         });
 };
+
+exports.getCommentCount = () => {};

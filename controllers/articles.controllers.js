@@ -4,6 +4,7 @@ const {
     updateArticles,
     checkArticleExists,
 } = require("../models/articles.models");
+const { getCommentCount } = require("../models/comments.models");
 
 exports.getArticles = (req, res, next) => {
     selectArticles().then((articles) => {
