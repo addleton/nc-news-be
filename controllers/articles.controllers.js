@@ -3,6 +3,7 @@ const {
     selectArticleById,
     updateArticles,
     checkArticleExists,
+    checkArticleQuery,
 } = require("../models/articles.models");
 const { checkTopicExists } = require("../models/topics.models");
 
