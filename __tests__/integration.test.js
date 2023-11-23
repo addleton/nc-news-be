@@ -333,6 +333,14 @@ describe("GET /api/articles (topic query)", () => {
                 });
             });
     });
+    test("200: responds with an empty array when no articles contain the topic passed in", () => {
+        return request(app)
+            .get("/api/articles?topic=paper")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.articles).toEqual([]);
+            });
+    });
     test("400: responds with a message when passed an invalid column in query", () => {
         return request(app)
             .get("/api/articles?pepsi=mitch")

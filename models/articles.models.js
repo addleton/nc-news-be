@@ -17,7 +17,7 @@ exports.selectArticleById = (id) => {
     });
 };
 
-exports.checkArticleExists = (id, topic, query) => {
+exports.checkArticleExists = (id, query) => {
     const validQueries = ["topic"];
     if (query && !validQueries.includes(query)) {
         return Promise.reject({ status: 400, msg: "Bad request" });
@@ -33,18 +33,6 @@ exports.checkArticleExists = (id, topic, query) => {
                     return Promise.reject({
                         status: 404,
                         msg: "Article not found",
-                    });
-                }
-            });
-    }
-    if (topic) {
-        return db
-            .query(`SELECT * FROM articles WHERE topic = $1`, [topic])
-            .then(({ rows }) => {
-                if (!rows.length) {
-                    return Promise.reject({
-                        status: 404,
-                        msg: "Not found",
                     });
                 }
             });

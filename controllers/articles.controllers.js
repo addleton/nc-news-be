@@ -5,13 +5,17 @@ const {
     checkArticleExists,
     checkArticleQuery,
 } = require("../models/articles.models");
+const { checkTopicExists } = require("../models/topics.models");
 
 exports.getArticles = (req, res, next) => {
     const [query] = Object.keys(req.query);
     const { topic } = req.query;
     const articlePromises = [selectArticles(topic)];
     if (query) {
-        articlePromises.push(checkArticleExists(undefined, topic, query));
+        articlePromises.push(checkArticleExists(undefined, query));
+    }
+    if (topic) {
+        articlePromises.push(checkTopicExists(topic));
     }
     Promise.all(articlePromises)
         .then((resolvedPromises) => {
