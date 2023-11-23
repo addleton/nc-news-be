@@ -4,12 +4,24 @@ const {
     updateArticles,
     checkArticleExists,
 } = require("../models/articles.models");
-const { getCommentCount } = require("../models/comments.models");
+const { checkTopicExists } = require("../models/topics.models");
 
 exports.getArticles = (req, res, next) => {
-    selectArticles().then((articles) => {
-        res.status(200).send({ articles });
-    });
+    const [query] = Object.keys(req.query);
+    const { topic } = req.query;
+    const articlePromises = [selectArticles(topic)];
+    if (query) {
+        articlePromises.push(checkArticleExists(undefined, query));
+    }
+    if (topic) {
+        articlePromises.push(checkTopicExists(topic));
+    }
+    Promise.all(articlePromises)
+        .then((resolvedPromises) => {
+            const articles = resolvedPromises[0];
+            res.status(200).send({ articles });
+        })
+        .catch(next);
 };
 
 exports.getArticleById = (req, res, next) => {
