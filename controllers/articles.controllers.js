@@ -7,12 +7,18 @@ const {
 } = require("../models/articles.models");
 
 exports.getArticles = (req, res, next) => {
-    const [query] = Object.keys(req.query)
-    const {topic} = req.query
-    checkArticleQuery(query)
-    selectArticles(topic).then((articles) => {
-        res.status(200).send({ articles });
-    }).catch(next)
+    const [query] = Object.keys(req.query);
+    const { topic } = req.query;
+    const articlePromises = [selectArticles(topic)];
+    if (query) {
+        articlePromises.push(checkArticleExists(undefined, topic, query));
+    }
+    Promise.all(articlePromises)
+        .then((resolvedPromises) => {
+            const articles = resolvedPromises[0];
+            res.status(200).send({ articles });
+        })
+        .catch(next);
 };
 
 exports.getArticleById = (req, res, next) => {

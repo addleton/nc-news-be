@@ -17,21 +17,40 @@ exports.selectArticleById = (id) => {
     });
 };
 
-exports.checkArticleExists = (id) => {
-    if (isNaN(Number(id)) && id !== undefined) {
+exports.checkArticleExists = (id, topic, query) => {
+    const validQueries = ["topic"];
+    if (query && !validQueries.includes(query)) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
-    return db
-        .query(`SELECT * FROM articles WHERE article_id = $1`, [id])
-        .then(({ rows }) => {
-            if (!rows.length) {
-                return Promise.reject({
-                    status: 404,
-                    msg: "Article not found",
-                });
-            }
-        });
+    if (id) {
+        if (isNaN(Number(id)) && id !== undefined) {
+            return Promise.reject({ status: 400, msg: "Bad request" });
+        }
+        return db
+            .query(`SELECT * FROM articles WHERE article_id = $1`, [id])
+            .then(({ rows }) => {
+                if (!rows.length) {
+                    return Promise.reject({
+                        status: 404,
+                        msg: "Article not found",
+                    });
+                }
+            });
+    }
+    if (topic) {
+        return db
+            .query(`SELECT * FROM articles WHERE topic = $1`, [topic])
+            .then(({ rows }) => {
+                if (!rows.length) {
+                    return Promise.reject({
+                        status: 404,
+                        msg: "Not found",
+                    });
+                }
+            });
+    }
 };
+
 exports.selectArticles = (topic) => {
     const queryArray = [];
     let queryString = `
@@ -63,9 +82,3 @@ exports.updateArticles = (id, vote) => {
             return rows[0];
         });
 };
-
-exports.checkArticleQuery = (query) => {
-    return db.query(`SELECT $1 FROM articles`, [query]).then(({rows}) => {
-        console.log(rows)
-    })
-}
