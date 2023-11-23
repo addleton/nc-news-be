@@ -387,3 +387,16 @@ describe("GET /api/articles/:article_id (comment_count)", () => {
             });
     });
 });
+
+describe("GET /api/articles (sorting queries)", () => {
+    test.only("200: responds with an array of all articles, sorted and ordered by the query passed in", () => {
+        return request(app)
+            .get("/api/articles?sort_by=article_id&order=asc")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.articles).toBeSortedBy("article_id", {
+                    ascending: true,
+                });
+            });
+    });
+});

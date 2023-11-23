@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { sort } = require("../db/data/test-data/articles");
 
 exports.selectArticleById = (id) => {
     if (isNaN(Number(id)) && id !== undefined) {
@@ -22,7 +23,8 @@ exports.selectArticleById = (id) => {
 };
 
 exports.checkArticleExists = (id, query) => {
-    const validQueries = ["topic"];
+    console.log(query);
+    const validQueries = ["topic", "sort_by"];
     if (query && !validQueries.includes(query)) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
@@ -43,7 +45,22 @@ exports.checkArticleExists = (id, query) => {
     }
 };
 
-exports.selectArticles = (topic) => {
+exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
+    const validSortBy = [
+        "article_id",
+        "topic",
+        "author",
+        "title",
+        "votes",
+        "created_at",
+    ];
+    const validOrder = ["asc", "desc"];
+    if (
+        (sort_by && !validSortBy.includes(sort_by)) ||
+        (order && !validOrder.includes(order))
+    ) {
+        return Promise.reject({ status: 400, msg: "Bad request" });
+    }
     const queryArray = [];
     let queryString = `
         SELECT articles.*, COALESCE(COUNT(comments.article_id), 0) AS comment_count
@@ -54,7 +71,7 @@ exports.selectArticles = (topic) => {
         queryString += `WHERE articles.topic = $1`;
     }
     queryString += `GROUP BY articles.article_id 
-                    ORDER BY articles.created_at DESC `;
+                    ORDER BY ${sort_by} ${order} `;
 
     return db.query(queryString, queryArray).then(({ rows }) => {
         return rows;
