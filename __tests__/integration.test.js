@@ -93,6 +93,58 @@ describe("GET /api/articles/:article_id/comments", () => {
                 expect(body.comments).toEqual([]);
             });
     });
+    test("200: responds with an array of comments equal to the amount set by limit", () => {
+        return request(app)
+            .get("/api/articles/1/comments?limit=2")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comments).toHaveLength(2);
+                expect(body.comments).toEqual([
+                    {
+                        comment_id: 9,
+                        body: "Superficially charming",
+                        article_id: 1,
+                        author: "icellusedkars",
+                        votes: 0,
+                        created_at: "2020-01-01T03:08:00.000Z",
+                    },
+                    {
+                        comment_id: 4,
+                        body: " I carry a log — yes. Is it funny to you? It is not to me.",
+                        article_id: 1,
+                        author: "icellusedkars",
+                        votes: -100,
+                        created_at: "2020-02-23T12:01:00.000Z",
+                    },
+                ]);
+            });
+    });
+    test("200: responds with array of comments when taking p query in", () => {
+        return request(app)
+            .get("/api/articles/1/comments?limit=2&p=3")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comments).toHaveLength(2);
+                expect(body.comments).toEqual([
+                    {
+                        comment_id: 6,
+                        body: "I hate streaming eyes even more",
+                        article_id: 1,
+                        author: "icellusedkars",
+                        votes: 0,
+                        created_at: "2020-04-11T21:02:00.000Z",
+                    },
+                    {
+                        comment_id: 8,
+                        body: "Delicious crackerbreads",
+                        article_id: 1,
+                        author: "icellusedkars",
+                        votes: 0,
+                        created_at: "2020-04-14T20:19:00.000Z",
+                    },
+                ]);
+            });
+    });
     test("404: responds with error message when passed a number that does not match an article id", () => {
         return request(app)
             .get("/api/articles/99/comments")
@@ -104,6 +156,22 @@ describe("GET /api/articles/:article_id/comments", () => {
     test("400: responds with error messahe when passed not a number", () => {
         return request(app)
             .get("/api/articles/pepsi/comments")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
+    test("400: should respond with a message when passed a non number for limit", () => {
+        return request(app)
+            .get("/api/articles/1/comments?limit=pepsi&p=2")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
+    test("400: should respond with a message when passed a non number for page", () => {
+        return request(app)
+            .get("/api/articles/1/comments?limit=2&p=pepsi")
             .expect(400)
             .then(({ body }) => {
                 expect(body.msg).toBe("Bad request");

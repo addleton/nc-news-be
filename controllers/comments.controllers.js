@@ -24,7 +24,8 @@ exports.postCommentByArticle = (req, res, next) => {
 
 exports.getComments = (req, res, next) => {
     const { article_id } = req.params;
-    const commentPromises = [selectComments(article_id)];
+    const { limit, p } = req.query;
+    const commentPromises = [selectComments(article_id, limit, p)];
     if (article_id) {
         commentPromises.push(checkArticleExists(article_id));
     }

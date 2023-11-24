@@ -14,13 +14,15 @@ exports.insertComment = (comment, id) => {
         });
 };
 
-exports.selectComments = (id) => {
+exports.selectComments = (id, limit = 10, p = 1) => {
+    const offset = limit * (p - 1);
     return db
         .query(
             `SELECT * FROM comments
             WHERE article_id = $1
-            ORDER BY created_at ASC`,
-            [id]
+            ORDER BY created_at ASC
+            LIMIT $2 OFFSET $3`,
+            [id, limit, offset]
         )
         .then(({ rows }) => {
             return rows;
@@ -59,4 +61,4 @@ exports.updateComments = (id, vote) => {
         .then(({ rows }) => {
             return rows[0];
         });
-}
+};
