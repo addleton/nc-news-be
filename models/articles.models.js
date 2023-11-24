@@ -36,7 +36,7 @@ exports.checkArticleExists = (id, query) => {
                 if (!rows.length) {
                     return Promise.reject({
                         status: 404,
-                        msg: "Article not found",
+                        msg: "Not found",
                     });
                 }
             });
@@ -137,4 +137,8 @@ exports.selectCount = (topic) => {
     return db.query(queryString, queryArray).then(({ rows }) => {
         return rows[0];
     });
+};
+
+exports.deleteArticle = (id) => {
+    return db.query(`DELETE FROM articles WHERE article_id = $1`, [id]);
 };

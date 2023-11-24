@@ -5,6 +5,7 @@ const {
     checkArticleExists,
     insertArticle,
     selectCount,
+    deleteArticle,
 } = require("../models/articles.models");
 const { checkTopicExists } = require("../models/topics.models");
 
@@ -66,6 +67,19 @@ exports.postArticle = (req, res, next) => {
         })
         .then((article) => {
             res.status(201).send({ article });
+        })
+        .catch(next);
+};
+
+exports.removeArticle = (req, res, next) => {
+    const { article_id } = req.params;
+    const articlePromises = [
+        checkArticleExists(article_id),
+        deleteArticle(article_id),
+    ];
+    Promise.all(articlePromises)
+        .then((resolvedPromises) => {
+            res.status(204).send();
         })
         .catch(next);
 };

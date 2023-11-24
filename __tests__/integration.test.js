@@ -150,7 +150,7 @@ describe("GET /api/articles/:article_id/comments", () => {
             .get("/api/articles/99/comments")
             .expect(404)
             .then(({ body }) => {
-                expect(body.msg).toBe("Article not found");
+                expect(body.msg).toBe("Not found");
             });
     });
     test("400: responds with error messahe when passed not a number", () => {
@@ -317,7 +317,7 @@ describe("PATCH /api/articles/:article_id", () => {
             .send({ inc_votes: newVote })
             .expect(404)
             .then(({ body }) => {
-                expect(body.msg).toBe("Article not found");
+                expect(body.msg).toBe("Not found");
             });
     });
     test("400: responds with error when passed a vote that is not a number", () => {
@@ -811,6 +811,28 @@ describe("POST /api/topics", () => {
             .expect(400)
             .then(({ body }) => {
                 expect(body.msg).toBe("Bad request");
+            });
+    });
+});
+
+describe("DELETE /api/articles/:article_id", () => {
+    test("204: responds with status code", () => {
+        return request(app).delete("/api/articles/4").expect(204);
+    });
+    test("400: responds with an error message when passed an id that is not a number", () => {
+        return request(app)
+            .delete("/api/articles/pepsi")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
+    test("404: responds with an error message when passed an id that does not exist", () => {
+        return request(app)
+            .delete("/api/articles/99")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found");
             });
     });
 });

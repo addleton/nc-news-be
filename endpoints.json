@@ -247,5 +247,8 @@
                 "description": "hit ball with bat"
             }
         }
+    },
+    "DELETE /api/articles/:article_id": {
+        "description": "deletes an article from the database that matches the article_id passed in"
     }
 }
