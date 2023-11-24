@@ -400,3 +400,27 @@ describe("GET /api/articles (sorting queries)", () => {
             });
     });
 });
+
+describe("GET /api/users/:username", () => {
+    test("200: responds with a user object with the correct properties", () => {
+        return request(app)
+            .get("/api/users/icellusedkars")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.user).toEqual({
+                    username: "icellusedkars",
+                    name: "sam",
+                    avatar_url:
+                        "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4",
+                });
+            });
+    });
+    test("404: responds with a message when passed a username that does not exist", () => {
+        return request(app)
+            .get("/api/users/pepsi")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe('User not found');
+            });
+    });
+});
