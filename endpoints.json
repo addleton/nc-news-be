@@ -11,7 +11,7 @@
     },
     "GET /api/articles": {
         "description": "serves an array of all articles",
-        "queries": ["author", "topic", "sort_by", "order"],
+        "queries": ["author", "topic", "sort_by", "order", "limit", "p"],
         "exampleResponse": {
             "articles": [
                 {
@@ -186,6 +186,32 @@
                 "votes": 0,
                 "comment_count": 0
             }
+        }
+    },
+    "GET /api/articles?limit=2&p=2 (pagination)": {
+        "description": "serves a number of articles from the limit passed in and which page to start at from p",
+        "queries": ["author", "topic", "sort_by", "order", "limit", "p"],
+        "exampleResponse": {
+            "articles": [
+                {
+                    "title": "Seafood substitutions are increasing",
+                    "topic": "cooking",
+                    "author": "weegembump",
+                    "body": "Text from the article..",
+                    "created_at": "2018-05-30T15:59:13.341Z",
+                    "votes": 0,
+                    "comment_count": 6
+                },
+                {
+                    "title": "Running a Node App",
+                    "topic": "coding",
+                    "author": "jessjelly",
+                    "body": "This is part two of a series on how to get up and running with Systemd and Node.js. This part dives deeper into how to successfully run your app with systemd long-term, and how to set it up in a production environment.",
+                    "created_at": 1604728980000,
+                    "votes": 20,
+                    "comment_count": 2
+                }
+            ]
         }
     }
 }
