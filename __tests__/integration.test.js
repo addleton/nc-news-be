@@ -5,6 +5,7 @@ const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const sorted = require("jest-sorted");
 const fs = require("fs/promises");
+const { execPath } = require("process");
 
 afterAll(() => {
     return db.end();
@@ -420,7 +421,84 @@ describe("GET /api/users/:username", () => {
             .get("/api/users/pepsi")
             .expect(404)
             .then(({ body }) => {
-                expect(body.msg).toBe('User not found');
+                expect(body.msg).toBe("User not found");
+            });
+    });
+});
+
+describe("PATCH /api/comments/:comment_id", () => {
+    test("200: increments votes to comment id passed in and returns the updated comment", () => {
+        const newVote = 5;
+        return request(app)
+            .patch("/api/comments/5")
+            .send({ inc_votes: newVote })
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comment).toEqual({
+                    comment_id: 5,
+                    body: "I hate streaming noses",
+                    votes: 5,
+                    author: "icellusedkars",
+                    article_id: 1,
+                    created_at: "2020-11-03T21:00:00.000Z",
+                });
+            });
+    });
+    test("200: decrements votes to comment id passed in and returns the updated comment", () => {
+        const newVote = -50;
+        return request(app)
+            .patch("/api/comments/3")
+            .send({ inc_votes: newVote })
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comment).toEqual({
+                    comment_id: 3,
+                    body: "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works.",
+                    votes: 50,
+                    author: "icellusedkars",
+                    article_id: 1,
+                    created_at: "2020-03-01T01:13:00.000Z",
+                });
+            });
+    });
+    test("200: votes does not go below 0", () => {
+        const newVote = -100;
+        return request(app)
+            .patch("/api/comments/5")
+            .send({ inc_votes: newVote })
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comment.votes).toBe(0);
+            });
+    });
+    test("400: responds with error when passed a comment ID that is not a number", () => {
+        const newVote = -5;
+        return request(app)
+            .patch("/api/comments/pepsi")
+            .send({ inc_votes: newVote })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
+    test("404: responds with error when passed a comment ID that is a number but does not exist", () => {
+        const newVote = -5;
+        return request(app)
+            .patch("/api/comments/99")
+            .send({ inc_votes: newVote })
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Comment not found");
+            });
+    });
+    test("400: responds with error when passed a vote that is not a number", () => {
+        const newVote = "pepsi";
+        return request(app)
+            .patch("/api/comments/1")
+            .send({ inc_votes: newVote })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
             });
     });
 });

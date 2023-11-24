@@ -48,3 +48,17 @@ exports.checkCommentExists = (id) => {
             }
         });
 };
+
+exports.updateComments = (id, vote) => {
+    return db
+        .query(
+            `UPDATE comments
+                    SET votes = GREATEST(votes + $1, 0)
+                    WHERE comment_id = $2
+                    RETURNING *`,
+            [vote, id]
+        )
+        .then(({ rows }) => {
+            return rows[0];
+        });
+}
