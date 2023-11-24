@@ -783,3 +783,34 @@ describe("GET /api/articles (pagination)", () => {
             });
     });
 });
+
+describe("POST /api/topics", () => {
+    test("201: responds with the newly added topic passed in", () => {
+        const newTopic = {
+            slug: "test_topic",
+            description: "test_desc",
+        };
+        return request(app)
+            .post("/api/topics")
+            .send(newTopic)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.topic).toEqual({
+                    slug: "test_topic",
+                    description: "test_desc",
+                });
+            });
+    });
+    test("400: responds with a message when input is missing a property", () => {
+        const newTopic = {
+            description: "test_desc",
+        };
+        return request(app)
+            .post("/api/topics")
+            .send(newTopic)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
+});

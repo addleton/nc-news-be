@@ -237,5 +237,15 @@
                 }
             ]
         }
+    },
+    "POST /api/topics": {
+        "description": "posts a new topic to the database with relevant keys",
+        "queries": [],
+        "exampleResponse": {
+            "topic": {
+                "slug": "baseball",
+                "description": "hit ball with bat"
+            }
+        }
     }
 }
