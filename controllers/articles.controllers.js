@@ -3,6 +3,7 @@ const {
     selectArticleById,
     updateArticles,
     checkArticleExists,
+    insertArticle,
 } = require("../models/articles.models");
 const { checkTopicExists } = require("../models/topics.models");
 
@@ -45,6 +46,18 @@ exports.patchArticles = (req, res, next) => {
         .then((resolvedPromises) => {
             const article = resolvedPromises[0];
             res.status(200).send({ article });
+        })
+        .catch(next);
+};
+
+exports.postArticle = (req, res, next) => {
+    const newArticle = req.body;
+    insertArticle(newArticle)
+        .then((article) => {
+            return selectArticleById(article.article_id);
+        })
+        .then((article) => {
+            res.status(201).send({ article });
         })
         .catch(next);
 };

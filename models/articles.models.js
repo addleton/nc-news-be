@@ -89,3 +89,31 @@ exports.updateArticles = (id, vote) => {
             return rows[0];
         });
 };
+
+exports.insertArticle = (newArticle) => {
+    if (!newArticle.article_img_url) {
+        newArticle.article_img_url =
+            "https://img-rpba.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/09/21154112/siberianhuskycharacteristics-1024x766.jpg";
+    }
+    const currentTime = new Date();
+    return db
+        .query(
+            `INSERT INTO articles
+                    (author, title, body, topic, article_img_url, votes, created_at)
+                    VALUES
+                    ($1, $2, $3, $4, $5, $6, $7)
+                    RETURNING *`,
+            [
+                newArticle.author,
+                newArticle.title,
+                newArticle.body,
+                newArticle.topic,
+                newArticle.article_img_url,
+                0,
+                currentTime,
+            ]
+        )
+        .then(({ rows }) => {
+            return rows[0];
+        });
+};

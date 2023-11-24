@@ -166,7 +166,7 @@ describe("POST /api/articles/:article_id/comments", () => {
             .send(newComment)
             .expect(404)
             .then(({ body }) => {
-                expect(body.msg).toBe("Article not found");
+                expect(body.msg).toBe("Not found");
             });
     });
 });
@@ -497,6 +497,98 @@ describe("PATCH /api/comments/:comment_id", () => {
             .expect(400)
             .then(({ body }) => {
                 expect(body.msg).toBe("Bad request");
+            });
+    });
+});
+
+describe("POST /api/articles", () => {
+    test("201: responds with the posted article with all the relevant properties", () => {
+        const newArticle = {
+            author: "lurker",
+            title: "What is your favourite drink?",
+            body: "Mine is pepsi",
+            topic: "mitch",
+            article_img_url:
+                "https://www.megaretailer.com/media/catalog/product/cache/a6f4aec1db93cb13677a62a0babd5631/U/-/U-1PE3MCH0-15_11_2022_14_00_14.jpg",
+        };
+        return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.article).toEqual({
+                    author: "lurker",
+                    title: "What is your favourite drink?",
+                    body: "Mine is pepsi",
+                    topic: "mitch",
+                    article_img_url:
+                        "https://www.megaretailer.com/media/catalog/product/cache/a6f4aec1db93cb13677a62a0babd5631/U/-/U-1PE3MCH0-15_11_2022_14_00_14.jpg",
+                    article_id: 14,
+                    votes: 0,
+                    created_at: expect.any(String),
+                    comment_count: "0",
+                });
+            });
+    });
+    test("201: assigns default url to object when no url is provided", () => {
+        const newArticle = {
+            author: "lurker",
+            title: "What is your favourite drink?",
+            body: "Mine is pepsi",
+            topic: "mitch",
+        };
+        return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.article.article_img_url).toBe(
+                    "https://img-rpba.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/09/21154112/siberianhuskycharacteristics-1024x766.jpg"
+                );
+            });
+    });
+    test("400: responds with a message when the new article is missing a property", () => {
+        const newArticle = {
+            author: "lurker",
+            body: "Mine is pepsi",
+            topic: "mitch",
+        };
+        return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
+    test("404: responds with a message if the user does not exist", () => {
+        const newArticle = {
+            author: "david",
+            title: "What is your favourite drink?",
+            body: "Mine is pepsi",
+            topic: "mitch",
+        };
+        return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found");
+            });
+    });
+    test("404: responds with a message if the topic does not exist", () => {
+        const newArticle = {
+            author: "lurker",
+            title: "What is your favourite drink?",
+            body: "Mine is pepsi",
+            topic: "wallpaper",
+        };
+        return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found");
             });
     });
 });
