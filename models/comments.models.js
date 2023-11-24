@@ -1,7 +1,5 @@
 const db = require("../db/connection");
 
-const fs = require("fs/promises");
-
 exports.insertComment = (comment, id) => {
     return db
         .query(

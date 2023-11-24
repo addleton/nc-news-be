@@ -4,8 +4,6 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const sorted = require("jest-sorted");
-const fs = require("fs/promises");
-const { execPath } = require("process");
 
 afterAll(() => {
     return db.end();
