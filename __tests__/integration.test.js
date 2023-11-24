@@ -784,7 +784,7 @@ describe("GET /api/articles (pagination)", () => {
     });
 });
 
-describe.only("POST /api/topics", () => {
+describe("POST /api/topics", () => {
     test("201: responds with the newly added topic passed in", () => {
         const newTopic = {
             slug: "test_topic",
