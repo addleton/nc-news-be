@@ -22,7 +22,7 @@ exports.selectArticleById = (id) => {
 };
 
 exports.checkArticleExists = (id, query) => {
-    const validQueries = ["topic", "sort_by"];
+    const validQueries = ["topic", "sort_by", "limit", "author"];
     if (query && !validQueries.includes(query)) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
@@ -43,7 +43,13 @@ exports.checkArticleExists = (id, query) => {
     }
 };
 
-exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
+exports.selectArticles = (
+    sort_by = "created_at",
+    order = "desc",
+    topic,
+    limit = 10,
+    p = 1
+) => {
     const validSortBy = [
         "article_id",
         "topic",
@@ -53,23 +59,25 @@ exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
         "created_at",
     ];
     const validOrder = ["asc", "desc"];
+    const offset = limit * (p - 1);
     if (
         (sort_by && !validSortBy.includes(sort_by)) ||
         (order && !validOrder.includes(order))
     ) {
         return Promise.reject({ status: 400, msg: "Bad request" });
     }
-    const queryArray = [];
+    const queryArray = [limit, offset];
     let queryString = `
         SELECT articles.*, COALESCE(COUNT(comments.article_id), 0) AS comment_count
         FROM articles
         LEFT JOIN comments ON articles.article_id = comments.article_id `;
     if (topic) {
         queryArray.push(topic);
-        queryString += `WHERE articles.topic = $1`;
+        queryString += `WHERE articles.topic = $3`;
     }
     queryString += `GROUP BY articles.article_id 
-                    ORDER BY ${sort_by} ${order} `;
+                    ORDER BY ${sort_by} ${order} 
+                    LIMIT $1 OFFSET $2`;
 
     return db.query(queryString, queryArray).then(({ rows }) => {
         return rows;
@@ -116,4 +124,17 @@ exports.insertArticle = (newArticle) => {
         .then(({ rows }) => {
             return rows[0];
         });
+};
+
+exports.selectCount = (topic) => {
+    const queryArray = [];
+    let queryString = `SELECT COUNT(articles.article_id) as total_count
+    FROM articles `;
+    if (topic) {
+        queryArray.push(topic);
+        queryString += `WHERE topic = $1`;
+    }
+    return db.query(queryString, queryArray).then(({ rows }) => {
+        return rows[0];
+    });
 };

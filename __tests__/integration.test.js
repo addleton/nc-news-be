@@ -42,7 +42,7 @@ describe("GET /api/articles", () => {
             .get("/api/articles")
             .expect(200)
             .then(({ body }) => {
-                expect(body.articles).toHaveLength(13);
+                expect(body.articles).toHaveLength(10);
                 expect(body.articles).toBeSortedBy("created_at", {
                     descending: true,
                 });
@@ -310,7 +310,7 @@ describe("GET /api/articles (topic query)", () => {
             .get("/api/articles?topic=mitch")
             .expect(200)
             .then(({ body }) => {
-                expect(body.articles).toHaveLength(12);
+                expect(body.articles).toHaveLength(10);
                 body.articles.forEach((article) => {
                     expect(article.topic).toBe("mitch");
                 });
@@ -589,6 +589,129 @@ describe("POST /api/articles", () => {
             .expect(404)
             .then(({ body }) => {
                 expect(body.msg).toBe("Not found");
+            });
+    });
+});
+
+describe("GET /api/articles (pagination)", () => {
+    test("200: responds with an array of articles equal to the amount set by limit and a total count of all articles", () => {
+        return request(app)
+            .get("/api/articles?limit=2")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.articles).toHaveLength(2);
+                expect(body.total_count).toEqual("13");
+                expect(body.articles).toEqual([
+                    {
+                        article_id: 3,
+                        title: "Eight pug gifs that remind me of mitch",
+                        topic: "mitch",
+                        author: "icellusedkars",
+                        body: "some gifs",
+                        created_at: "2020-11-03T09:12:00.000Z",
+                        votes: 0,
+                        article_img_url:
+                            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                        comment_count: "2",
+                    },
+                    {
+                        article_id: 6,
+                        title: "A",
+                        topic: "mitch",
+                        author: "icellusedkars",
+                        body: "Delicious tin of cat food",
+                        created_at: "2020-10-18T01:00:00.000Z",
+                        votes: 0,
+                        article_img_url:
+                            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                        comment_count: "1",
+                    },
+                ]);
+            });
+    });
+    test("200: responds with array of articles when taking p query in", () => {
+        return request(app)
+            .get("/api/articles?limit=2&p=3")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.articles).toHaveLength(2);
+                expect(body.total_count).toBe("13");
+                expect(body.articles).toEqual([
+                    {
+                        article_id: 12,
+                        title: "Moustache",
+                        topic: "mitch",
+                        author: "butter_bridge",
+                        body: "Have you seen the size of that thing?",
+                        created_at: "2020-10-11T11:24:00.000Z",
+                        votes: 0,
+                        article_img_url:
+                            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                        comment_count: "0",
+                    },
+                    {
+                        article_id: 5,
+                        title: "UNCOVERED: catspiracy to bring down democracy",
+                        topic: "cats",
+                        author: "rogersop",
+                        body: "Bastet walks amongst us, and the cats are taking arms!",
+                        created_at: "2020-08-03T13:14:00.000Z",
+                        votes: 0,
+                        article_img_url:
+                            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                        comment_count: "2",
+                    },
+                ]);
+            });
+    });
+    test("200: responds with correct total_count when passed any filters", () => {
+        return request(app)
+            .get("/api/articles?topic=mitch&limit=2")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.total_count).toBe("12");
+                expect(body.articles).toEqual([
+                    {
+                        article_id: 3,
+                        title: "Eight pug gifs that remind me of mitch",
+                        topic: "mitch",
+                        author: "icellusedkars",
+                        body: "some gifs",
+                        created_at: "2020-11-03T09:12:00.000Z",
+                        votes: 0,
+                        article_img_url:
+                            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                        comment_count: "2",
+                    },
+                    {
+                        article_id: 6,
+                        title: "A",
+                        topic: "mitch",
+                        author: "icellusedkars",
+                        body: "Delicious tin of cat food",
+                        created_at: "2020-10-18T01:00:00.000Z",
+                        votes: 0,
+                        article_img_url:
+                            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                        comment_count: "1",
+                    },
+                ]);
+            });
+    });
+    test("400: should respond with a message when passed a non number for limit", () => {
+        return request(app)
+            .get("/api/articles?limit=pepsi")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+    });
+    test("400: should respond with a message when passed a non number for page", () => {
+        return request(app)
+            .get("/api/articles?limit=2&p=pepsi")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
             });
     });
 });
