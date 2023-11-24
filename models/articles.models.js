@@ -1,5 +1,4 @@
 const db = require("../db/connection");
-const { sort } = require("../db/data/test-data/articles");
 
 exports.selectArticleById = (id) => {
     if (isNaN(Number(id)) && id !== undefined) {
