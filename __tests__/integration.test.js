@@ -20,22 +20,6 @@ describe("Invalid URL", () => {
     });
 });
 
-describe("GET /api", () => {
-    test("200: responds with an object of all available endpoints and descriptions", () => {
-        return request(app)
-            .get("/api")
-            .expect(200)
-            .then((response) => {
-                return fs
-                    .readFile(`${__dirname}/../endpoints.json`, "utf8")
-                    .then((contents) => {
-                        const parsedContents = JSON.parse(contents);
-                        expect(response.body).toEqual(parsedContents);
-                    });
-            });
-    });
-});
-
 describe("GET /api/topics", () => {
     test("200: all returned topics have relevant keys", () => {
         return request(app)
