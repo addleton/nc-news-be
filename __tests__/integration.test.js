@@ -42,7 +42,7 @@ describe("GET /api/articles", () => {
             .get("/api/articles")
             .expect(200)
             .then(({ body }) => {
-                expect(body.articles).toHaveLength(13);
+                expect(body.articles).toHaveLength(10);
                 expect(body.articles).toBeSortedBy("created_at", {
                     descending: true,
                 });
@@ -310,7 +310,7 @@ describe("GET /api/articles (topic query)", () => {
             .get("/api/articles?topic=mitch")
             .expect(200)
             .then(({ body }) => {
-                expect(body.articles).toHaveLength(12);
+                expect(body.articles).toHaveLength(10);
                 body.articles.forEach((article) => {
                     expect(article.topic).toBe("mitch");
                 });
@@ -590,5 +590,13 @@ describe("POST /api/articles", () => {
             .then(({ body }) => {
                 expect(body.msg).toBe("Not found");
             });
+    });
+});
+
+describe('GET /api/articles (pagination)', () => {
+    test('200: responds with an array of articles equal to the amount set by limit', () => {
+        return request(app).get('/api/articles?limit=5').expect(200).then(({body}) => {
+            expect(body.articles).toHaveLength(5)
+        })
     });
 });
