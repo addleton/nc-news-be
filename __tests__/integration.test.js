@@ -71,7 +71,7 @@ describe("GET /api/articles/:article_id/comments", () => {
             .then(({ body }) => {
                 expect(body.comments).toHaveLength(2);
                 expect(body.comments).toBeSorted("created_at", {
-                    ascending: true,
+                    ascending: false,
                 });
                 body.comments.forEach((comment) => {
                     expect(comment).toMatchObject({
@@ -101,20 +101,20 @@ describe("GET /api/articles/:article_id/comments", () => {
                 expect(body.comments).toHaveLength(2);
                 expect(body.comments).toEqual([
                     {
-                        comment_id: 9,
-                        body: "Superficially charming",
+                        comment_id: 5,
+                        body: "I hate streaming noses",
                         article_id: 1,
                         author: "icellusedkars",
                         votes: 0,
-                        created_at: "2020-01-01T03:08:00.000Z",
+                        created_at: "2020-11-03T21:00:00.000Z",
                     },
                     {
-                        comment_id: 4,
-                        body: " I carry a log — yes. Is it funny to you? It is not to me.",
+                        comment_id: 2,
+                        body: "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
                         article_id: 1,
-                        author: "icellusedkars",
-                        votes: -100,
-                        created_at: "2020-02-23T12:01:00.000Z",
+                        author: "butter_bridge",
+                        votes: 14,
+                        created_at: "2020-10-31T03:03:00.000Z",
                     },
                 ]);
             });
@@ -127,12 +127,12 @@ describe("GET /api/articles/:article_id/comments", () => {
                 expect(body.comments).toHaveLength(2);
                 expect(body.comments).toEqual([
                     {
-                        comment_id: 6,
-                        body: "I hate streaming eyes even more",
+                        comment_id: 7,
+                        body: "Lobster pot",
                         article_id: 1,
                         author: "icellusedkars",
                         votes: 0,
-                        created_at: "2020-04-11T21:02:00.000Z",
+                        created_at: "2020-05-15T20:19:00.000Z",
                     },
                     {
                         comment_id: 8,
