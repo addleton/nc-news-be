@@ -74,7 +74,7 @@ exports.selectArticles = (
         LEFT JOIN comments ON articles.article_id = comments.article_id `;
   if (topic) {
     queryArray.push(topic);
-    queryString += `WHERE articles.topic = $3`;
+    queryString += `WHERE articles.topic = $3 `;
   }
   queryString += `GROUP BY articles.article_id 
                     ORDER BY ${sort_by} ${order} 
